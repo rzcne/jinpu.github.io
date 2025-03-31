@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功德</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '微软雅黑', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #B8860B;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .donation-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .amount-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+
+        .amount-btn {
+            background: #B8860B;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .amount-btn.selected {
+            background: #996515;
+        }
+
+        .submit-btn {
+            background: #228B22;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .form-group div {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        input[type="radio"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        #custom-amount-group {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>功德福田</h1>
+        <p>广种福田 功德无量</p>
+    </header>
+
+    <div class="container">
+        <form class="donation-form" action="#">
+            <div class="form-group">
+                <h2>选择捐赠金额（元）</h2>
+                <div class="amount-options">
+                    <button type="button" class="amount-btn" data-amount="100">100</button>
+                    <button type="button" class="amount-btn" data-amount="300">300</button>
+                    <button type="button" class="amount-btn" data-amount="500">500</button>
+                    <button type="button" class="amount-btn" data-amount="1000">1000</button>
+                    <button type="button" class="amount-btn" data-amount="custom">自定义</button>
+                </div>
+                <div class="form-group" id="custom-amount-group">
+                    <label for="custom-amount">请输入自定义金额（元）</label>
+                    <input type="number" id="custom-amount" placeholder="输入金额">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="project">选择功德项目</label>
+                <select id="project">
+                    <option value="1">佛像贴金</option>
+                    <option value="2">经书印刷</option>
+                    <option value="3">寺院建设</option>
+                    <option value="4">供斋供僧</option>
+                    <option value="5">随喜功德</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="name">功德主姓名（可选）</label>
+                <input type="text" id="name" placeholder="请输入姓名">
+            </div>
+
+            <div class="form-group">
+                <label for="message">功德回向（可选）</label>
+                <textarea id="message" rows="4" placeholder="请输入回向文"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>支付方式</label>
+                <div>
+                    <input type="radio" name="payment" id="alipay" checked>
+                    <label for="alipay">支付宝</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">立即捐赠</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let selectedAmount = null;
+            let isCustom = false;
+
+            // 处理金额按钮点击
+            document.querySelectorAll('.amount-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    const amount = this.dataset.amount;
+                    
+                    if (amount === 'custom') {
+                        document.getElementById('custom-amount-group').style.display = 'block';
+                        selectedAmount = 'custom';
+                    } else {
+                        document.getElementById('custom-amount-group').style.display = 'none';
+                        selectedAmount = amount;
+                    }
+                });
+            });
+
+            // 处理表单提交
+            document.querySelector('.donation-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const alipayLinks = {
+                    '100': 'https://qr.alipay.com/2m614590ybtqxbecqwnre43',
+                    '300': 'https://qr.alipay.com/2m617832z6xfgtlmjfmn28f',
+                    '500': 'https://qr.alipay.com/2m618258fqstcgwwvihjt76',
+                    '1000': 'https://qr.alipay.com/2m6170872diowopeestpc52',
+                    'custom': 'https://qr.alipay.com/2m616379mwubl4gaoxny1f3'
+                };
+
+                if (!selectedAmount) {
+                    alert('请选择捐赠金额');
+                    return;
+                }
+
+                let url;
+                if (selectedAmount === 'custom') {
+                    const customAmount = document.getElementById('custom-amount').value;
+                    if (!customAmount || customAmount <= 0) {
+                        alert('请输入有效的自定义金额');
+                        return;
+                    }
+                    url = alipayLinks['custom'];
+                } else {
+                    url = alipayLinks[selectedAmount];
+                }
+
+                if (url) {
+                    window.location.href = url;
+                } else {
+                    alert('支付链接错误，请重试');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
