@@ -98,9 +98,48 @@
         #custom-amount-group {
             display: none;
         }
+
+        /* 微信提示样式 */
+        #wechat-tip {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        #wechat-tip img {
+            width: 200px;
+            margin: 2rem auto;
+            display: block;
+        }
+
+        #wechat-tip p {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        #wechat-tip .highlight {
+            color: #B8860B;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <!-- 微信提示层 -->
+    <div id="wechat-tip">
+        <p>检测到您在微信内访问</p>
+        <p class="highlight">请点击右上角 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFXSURBVHgB7ZXBDcIwDETFU0EdgQ1gA5gARoARYAMYATaADWAD2AA2oCMgHXyJj1QsJKRQ5Miv9C+JY+dZjmMkImYH5w6wA1wMl4A7YJkZ4HMAHwE3wH2iBvC5VHhWwKfA7U1wVgB+6A2wC8I9C8B/1W7Fh/3Q0gC/4iPgMvHj9QOQr9oB3gXhngXwK7ZvA3sWwK/6UoF7FsCv+lyBexbAr/pYgXsWwK/6UIF7FsCv+rcC9yyAX/WuAvcsgF/1tgL3LIBf9aYC9yyAX/W6AvcsgF/1qgL3LIBftazAPQvgV/1UgXsWwK/6XoF7FsCv+laBexbAr/pagXsWwK/6UoF7FsCv+lyBexbAr/pYgXsWwK/6UIF7FsCv+rcC9yyAX/WuAvcsgF/1tgL3LIBf9aYC9yyAX/W6AvcsgF/1qgL3LIBftazAPQvgV/1UgXsWwK/6XoF7FsCv+laBexbAr/pagXsWwK/6UoF7FsCv+lyBexbAr/pYgXsWwK/6UIF7FsCv+rcC9yyAX/WuAvcsgF/1tgL3LIBf9aYC9yyAX/W6AvcsgF/1qgL3LMAv2AOyUy8ZoS3wJAAAAABJRU5ErkJggg==" alt="菜单图标"><br>选择"在浏览器中打开"</p>
+        <p>完成功德捐赠</p>
+    </div>
+
     <header class="header">
         <h1>功德福田</h1>
         <p>广种福田 功德无量</p>
@@ -158,6 +197,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 微信浏览器检测
+            function isWeChatBrowser() {
+                const ua = navigator.userAgent.toLowerCase();
+                return ua.indexOf('micromessenger') !== -1;
+            }
+
+            // 显示微信提示
+            if (isWeChatBrowser()) {
+                document.getElementById('wechat-tip').style.display = 'block';
+                
+                // 阻止表单提交
+                document.querySelector('.donation-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('请使用浏览器打开本页面完成捐赠');
+                });
+            }
+
             let selectedAmount = null;
             let isCustom = false;
 
@@ -180,6 +236,9 @@
 
             // 处理表单提交
             document.querySelector('.donation-form').addEventListener('submit', function(e) {
+                // 如果已经在微信环境，已提前阻止提交
+                if (isWeChatBrowser()) return;
+
                 e.preventDefault();
 
                 const alipayLinks = {
